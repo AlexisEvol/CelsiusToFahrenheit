@@ -1,13 +1,18 @@
 package Forms;
 
+import Utils.CharacterToDouble;
 import Utils.TemperatureCalculator;
-import javax.swing.JComboBox;
+import Utils.TypeOfTemperatureReader;
 
 public class MainForm extends javax.swing.JFrame {
 
-    private String topTemperatureType;
-    private String bottomTemperatureType;
-    private TemperatureCalculator temperatureCalculator = new TemperatureCalculator();
+    private String topTemperatureType = "Celsius";
+    private String bottomTemperatureType = "Fahrenheit";
+    private final TemperatureCalculator temperatureCalculator = new TemperatureCalculator();
+    private CharacterToDouble characterToDouble = new CharacterToDouble();
+    private final TypeOfTemperatureReader typeOfTemperatureReader = new TypeOfTemperatureReader();
+    private int mouseTopClicks = 0;
+    private int mouseBottomClicks = 0;
 
     public MainForm() {
 
@@ -24,10 +29,9 @@ public class MainForm extends javax.swing.JFrame {
         txtTemperatureTop = new javax.swing.JTextField();
         cmbTemperatureBottom = new javax.swing.JComboBox<>();
         txtTemperatureBottom = new javax.swing.JTextField();
-        btnConvert = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Temperatures Converter");
+        setTitle("Temperature Converter");
 
         cmbTemperatureTop.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         cmbTemperatureTop.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Celsius", "Fahrenheit" }));
@@ -41,6 +45,11 @@ public class MainForm extends javax.swing.JFrame {
         lblTitle.setText("Temperature Converter");
 
         txtTemperatureTop.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        txtTemperatureTop.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                txtTemperatureTopMousePressed(evt);
+            }
+        });
         txtTemperatureTop.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txtTemperatureTopKeyPressed(evt);
@@ -56,14 +65,16 @@ public class MainForm extends javax.swing.JFrame {
         });
 
         txtTemperatureBottom.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        txtTemperatureBottom.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                txtTemperatureBottomMousePressed(evt);
+            }
+        });
         txtTemperatureBottom.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txtTemperatureBottomKeyPressed(evt);
             }
         });
-
-        btnConvert.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        btnConvert.setText("Convert");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -79,13 +90,9 @@ public class MainForm extends javax.swing.JFrame {
                             .addComponent(cmbTemperatureBottom, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(txtTemperatureTop)
-                            .addComponent(txtTemperatureBottom, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE))))
+                            .addComponent(txtTemperatureBottom, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE)
+                            .addComponent(txtTemperatureTop))))
                 .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addGap(146, 146, 146)
-                .addComponent(btnConvert)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -100,44 +107,56 @@ public class MainForm extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cmbTemperatureBottom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtTemperatureBottom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 48, Short.MAX_VALUE)
-                .addComponent(btnConvert)
-                .addContainerGap())
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtTemperatureBottomKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtTemperatureBottomKeyPressed
-        // TODO add your handling code here:
 
+        double number = characterToDouble.transformCharToDouble(txtTemperatureBottom, evt);
+        txtTemperatureTop.setText(String.valueOf(typeOfTemperatureReader.calculateTemperatures(bottomTemperatureType, number, temperatureCalculator)));
     }//GEN-LAST:event_txtTemperatureBottomKeyPressed
 
     private void txtTemperatureTopKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtTemperatureTopKeyPressed
-        // TODO add your handling code here:
 
+        double number = characterToDouble.transformCharToDouble(txtTemperatureTop, evt);
+        txtTemperatureBottom.setText(String.valueOf(typeOfTemperatureReader.calculateTemperatures(topTemperatureType, number, temperatureCalculator)));
     }//GEN-LAST:event_txtTemperatureTopKeyPressed
 
     private void cmbTemperatureBottomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbTemperatureBottomActionPerformed
-        // TODO add your handling code here:
+
         bottomTemperatureType = cmbTemperatureBottom.getSelectedItem().toString();
-        swapTemperaturesText(bottomTemperatureType, cmbTemperatureTop);
+        typeOfTemperatureReader.swapTemperaturesTypeText(bottomTemperatureType, cmbTemperatureTop);
     }//GEN-LAST:event_cmbTemperatureBottomActionPerformed
 
     private void cmbTemperatureTopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbTemperatureTopActionPerformed
-        // TODO add your handling code here:
+
         topTemperatureType = cmbTemperatureTop.getSelectedItem().toString();
-        swapTemperaturesText(topTemperatureType, cmbTemperatureBottom);
+        typeOfTemperatureReader.swapTemperaturesTypeText(topTemperatureType, cmbTemperatureBottom);
     }//GEN-LAST:event_cmbTemperatureTopActionPerformed
 
-    private void swapTemperaturesText(String actualTemperature, JComboBox opositComboBox) {
+    private void txtTemperatureTopMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtTemperatureTopMousePressed
 
-        if (actualTemperature.equals("Celsius")) {
-            opositComboBox.setSelectedItem("Fahrenheit");
-        } else {
-            opositComboBox.setSelectedItem("Celsius");
+        //This method is made to reset the method in this class every time we click for first time, allowing us to use the same class for everything
+        mouseBottomClicks += 1;
+        mouseTopClicks = 0;
+        if (mouseBottomClicks < 2){
+            characterToDouble = new CharacterToDouble();
+            txtTemperatureTop.setText("");
         }
-    }
+    }//GEN-LAST:event_txtTemperatureTopMousePressed
+
+    private void txtTemperatureBottomMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtTemperatureBottomMousePressed
+
+        mouseTopClicks += 1;
+        mouseBottomClicks = 0;
+        if (mouseTopClicks < 2){
+            characterToDouble = new CharacterToDouble();
+            txtTemperatureBottom.setText("");
+        }
+    }//GEN-LAST:event_txtTemperatureBottomMousePressed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -172,7 +191,6 @@ public class MainForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnConvert;
     private javax.swing.JComboBox<String> cmbTemperatureBottom;
     private javax.swing.JComboBox<String> cmbTemperatureTop;
     private javax.swing.JLabel lblTitle;
